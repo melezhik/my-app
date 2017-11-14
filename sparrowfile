@@ -1,22 +1,33 @@
-user "lt";
+user "web-application";
 
-directory "/home/lt/projects/lt", %( owner => 'lt', group => 'lt');
+directory "/home/web-application/projects/my-app", %( 
+  owner => 'web-application', 
+  group => 'web-application'
+);
 
-file '/home/lt/projects/lt/.htdigest', %( content => slurp '.htdigest', owner => 'lt', group => 'lt' );
+file '/home/web-application/projects/my-app/.htdigest', %( 
+  content => slurp '.htdigest', 
+  owner => 'web-application', 
+  group => 'web-application' 
+);
 
-git-scm 'git@gitlab.com:melezhik/language-tree.git', %( to => '/home/lt/projects/lt', user => "lt" , debug => False );
+git-scm 'https://github.com/melezhik/my-app.git', %( 
+  to => '/home/web-application/projects/my-app', 
+  user => "web-application" , 
+  debug => False 
+);
 
-bash "cd /home/lt/projects/lt && carton", %(
+bash "cd /home/web-application/projects/mt-app && carton", %(
   description => "update cpan dependencies by carton",
-  user => "lt"
+  user => "web-application"
 );
 
-systemd-service "lt-web", %(
-  user => "lt",
-  workdir => "/home/lt/projects/lt",
-  command => "/bin/bash --login -c 'cd /home/lt/projects/lt && carton exec ./app.pl daemon --listen http://0.0.0.0:4211'"
+systemd-service "my-app", %(
+  user => "web-application",
+  workdir => "/home/web-application/projects/my-app",
+  command => "/bin/bash --login -c 'cd /home/web-application/projects/my-app && carton exec ./app.pl daemon --listen http://0.0.0.0:3000'"
 );
 
-service-enable "lt-web";
-service-restart "lt-web";
+service-enable "my-app";
+service-restart "my-app";
 
