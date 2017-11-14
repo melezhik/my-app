@@ -1,0 +1,22 @@
+user "lt";
+
+directory "/home/lt/projects/lt", %( owner => 'lt', group => 'lt');
+
+file '/home/lt/projects/lt/.htdigest', %( content => slurp '.htdigest', owner => 'lt', group => 'lt' );
+
+git-scm 'git@gitlab.com:melezhik/language-tree.git', %( to => '/home/lt/projects/lt', user => "lt" , debug => False );
+
+bash "cd /home/lt/projects/lt && carton", %(
+  description => "update cpan dependencies by carton",
+  user => "lt"
+);
+
+systemd-service "lt-web", %(
+  user => "lt",
+  workdir => "/home/lt/projects/lt",
+  command => "/bin/bash --login -c 'cd /home/lt/projects/lt && carton exec ./app.pl daemon --listen http://0.0.0.0:4211'"
+);
+
+service-enable "lt-web";
+service-restart "lt-web";
+
